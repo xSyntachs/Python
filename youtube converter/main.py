@@ -4,6 +4,7 @@ import pyautogui
 import pyperclip
 import re
 import subprocess
+import time
 from plyer import notification
 
 # Konstanten
@@ -25,8 +26,10 @@ def is_valid_youtube_link(link):
 
 def get_browser_url(ADDRESS_FIELD_COORDS):
     """Holt die aktuelle URL aus dem Adressfeld des Browsers."""
-    pyautogui.click(*ADDRESS_FIELD_COORDS)
+    pyautogui.click()
+    time.sleep(0.1)
     pyautogui.hotkey('ctrl', 'a')
+    time.sleep(0.1)
     pyautogui.hotkey('ctrl', 'c')
     return pyperclip.paste()
 
@@ -64,8 +67,6 @@ def main():
         return
 
     # Benutzer bitten, das Adressfeld zu markieren
-    input("Bitte öffnen Sie Ihren Browser und navigieren Sie zu einem YouTube-Video. "
-          "Positionieren Sie den Mauszeiger über das Adressfeld und drücken Sie Enter.")
     ADDRESS_FIELD_COORDS = pyautogui.position()
 
     keyboard.add_hotkey(HOTKEY, download_video, args=(ADDRESS_FIELD_COORDS,))
