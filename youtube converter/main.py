@@ -7,7 +7,6 @@ import subprocess
 from plyer import notification
 
 # Konstanten
-ADDRESS_FIELD_COORDS = (400, 50)
 HOTKEY = 'ctrl+alt+d'
 DOWNLOAD_FOLDER = os.path.join(os.path.expanduser('~'), 'Downloads')
 
@@ -24,7 +23,7 @@ def is_valid_youtube_link(link):
     pattern = r'^https:\/\/www\.youtube\.com\/watch\?v=\w+(&\w+=\w+)*'
     return bool(re.match(pattern, link))
 
-def get_browser_url():
+def get_browser_url(ADDRESS_FIELD_COORDS):
     """Holt die aktuelle URL aus dem Adressfeld des Browsers."""
     pyautogui.click(*ADDRESS_FIELD_COORDS)
     pyautogui.hotkey('ctrl', 'a')
@@ -42,9 +41,9 @@ def download_video_from_url(url):
     ]
     subprocess.run(cmd)
 
-def download_video():
+def download_video(ADDRESS_FIELD_COORDS):
     try:
-        link = get_browser_url()
+        link = get_browser_url(ADDRESS_FIELD_COORDS)
         if not is_valid_youtube_link(link):
             show_notification('Fehler beim Download', 'Der Link ist kein gültiger YouTube-Link.')
             return
@@ -56,8 +55,24 @@ def download_video():
         show_notification('Fehler beim Download', f'Es ist ein Fehler aufgetreten: {str(e)}')
         print(str(e))
 
+def main():
+    # Überprüfen, ob yt-dlp installiert ist
+    try:
+        subprocess.run(['yt-dlp', '--version'], check=True)
+    except subprocess.CalledProcessError:
+        print("Bitte installieren Sie yt-dlp.")
+        return
 
-keyboard.add_hotkey(HOTKEY, download_video)
+    # Benutzer bitten, das Adressfeld zu markieren
+    input("Bitte öffnen Sie Ihren Browser und navigieren Sie zu einem YouTube-Video. "
+          "Positionieren Sie den Mauszeiger über das Adressfeld und drücken Sie Enter.")
+    ADDRESS_FIELD_COORDS = pyautogui.position()
 
-while True:
-    keyboard.wait()
+    keyboard.add_hotkey(HOTKEY, download_video, args=(ADDRESS_FIELD_COORDS,))
+
+    print(f"Drücken Sie {HOTKEY}, um das Video herunterzuladen.")
+    while True:
+        keyboard.wait()
+
+if __name__ == "__main__":
+    main()
