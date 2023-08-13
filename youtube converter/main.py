@@ -24,9 +24,10 @@ def is_valid_youtube_link(link):
     pattern = r'^https:\/\/www\.youtube\.com\/watch\?v=\w+(&\w+=\w+)*'
     return bool(re.match(pattern, link))
 
-def get_browser_url(ADDRESS_FIELD_COORDS):
+def get_browser_url():
     """Holt die aktuelle URL aus dem Adressfeld des Browsers."""
-    pyautogui.click()
+    x, y = pyautogui.position()  # Aktuelle Mausposition holen
+    pyautogui.click(x, y)  # An der aktuellen Mausposition klicken
     time.sleep(0.1)
     pyautogui.hotkey('ctrl', 'a')
     time.sleep(0.1)
@@ -44,9 +45,9 @@ def download_video_from_url(url):
     ]
     subprocess.run(cmd)
 
-def download_video(ADDRESS_FIELD_COORDS):
+def download_video():
     try:
-        link = get_browser_url(ADDRESS_FIELD_COORDS)
+        link = get_browser_url()
         if not is_valid_youtube_link(link):
             show_notification('Fehler beim Download', 'Der Link ist kein gültiger YouTube-Link.')
             return
@@ -66,14 +67,8 @@ def main():
         print("Bitte installieren Sie yt-dlp.")
         return
 
-    # Benutzer bitten, das Adressfeld zu markieren
-    ADDRESS_FIELD_COORDS = pyautogui.position()
-
-    keyboard.add_hotkey(HOTKEY, download_video, args=(ADDRESS_FIELD_COORDS,))
-
-    print(f"Drücken Sie {HOTKEY}, um das Video herunterzuladen.")
-    while True:
-        keyboard.wait()
+    keyboard.add_hotkey(HOTKEY, download_video)
+    keyboard.wait()
 
 if __name__ == "__main__":
     main()
